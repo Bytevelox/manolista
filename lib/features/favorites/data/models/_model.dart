@@ -1,0 +1,3 @@
+﻿class FavoriteModel {
+  const FavoriteModel();
+}

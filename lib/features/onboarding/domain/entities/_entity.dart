@@ -1,0 +1,3 @@
+﻿class OnboardingEntity {
+  const OnboardingEntity();
+}

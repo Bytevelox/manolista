@@ -1,0 +1,3 @@
+﻿class ProviderModel {
+  const ProviderModel();
+}

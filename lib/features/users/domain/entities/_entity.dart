@@ -1,0 +1,3 @@
+﻿class UserProfileEntity {
+  const UserProfileEntity();
+}

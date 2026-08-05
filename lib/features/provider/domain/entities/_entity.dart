@@ -1,0 +1,3 @@
+﻿class ProviderEntity {
+  const ProviderEntity();
+}

@@ -1,0 +1,3 @@
+﻿class NotificationEntity {
+  const NotificationEntity();
+}

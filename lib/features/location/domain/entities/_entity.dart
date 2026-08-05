@@ -1,0 +1,3 @@
+﻿class LocationEntity {
+  const LocationEntity();
+}
