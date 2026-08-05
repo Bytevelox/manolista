@@ -1,119 +1,187 @@
-# Responsabilidades de las carpetas en /lib
+# Responsabilidades de las carpetas en lib
 
-Este documento describe las responsabilidades y convenciones sugeridas para cada carpeta dentro de `lib` de este proyecto. Sirve para entender la arquitectura, mantener límites claros entre capas y saber cómo añadir nuevas funcionalidades de forma consistente.
+Este documento define la estructura esperada para el proyecto y explica qué debe ir en cada carpeta para mantener una arquitectura limpia y escalable.
 
-Estructura principal encontrada:
+## Objetivo general
 
-- [lib/config](C:/Users/Walid/Desktop/manolista.worktrees/lib-folder-responsibilities-doc/lib/config) - Configuración y constantes
-- [lib/core](C:/Users/Walid/Desktop/manolista.worktrees/lib-folder-responsibilities-doc/lib/core) - Núcleo compartido y abstracciones
-- [lib/features](C:/Users/Walid/Desktop/manolista.worktrees/lib-folder-responsibilities-doc/lib/features) - Módulos/funcionalidades por dominio
-- [lib/main.dart](C:/Users/Walid/Desktop/manolista.worktrees/lib-folder-responsibilities-doc/lib/main.dart) - Punto de entrada de la aplicación
+El proyecto sigue una arquitectura basada en:
+- Feature First
+- Clean Architecture
+- Separación clara entre UI, dominio y datos
+
+La idea es que cada feature sea independiente, que el código global viva en core y que las pantallas no se conviertan en contenedores de lógica de negocio.
 
 ---
 
-1) lib/config
+## Estructura principal
+
+- [lib/config](lib/config): configuración global y valores reutilizables
+- [lib/core](lib/core): utilidades, servicios compartidos y abstracciones globales
+- [lib/features](lib/features): módulos de negocio organizados por dominio
+- [lib/shared](lib/shared): componentes reutilizables que no son tan globales como core
+- [lib/main.dart](lib/main.dart): punto de entrada de la aplicación
+
+---
+
+## 1) lib/config
 
 Responsabilidad:
-- Contener la configuración de la aplicación: constantes, parámetros por entorno, carga de variables de entorno y configuración global (p. ej. timeouts, keys, flags de feature). También puede incluir la configuración de routing o temas si se considera "configuración" y no lógica de negocio.
+- Mantener la configuración global de la app.
+- Contener constantes, valores por entorno, flags, URLs base, temas y opciones compartidas.
 
-Contenido típico:
-- constantes.dart (claves, strings, tamaños por defecto)
-- env.dart / flavor.dart (selección de entorno: dev/staging/prod)
-- config_loader.dart (si hay lógica para leer archivos/assets o .env)
+Debe contener:
+- constantes de la app
+- configuración de entornos (dev, staging, prod)
+- valores estáticos que no cambian con la lógica del negocio
 
-Reglas y recomendaciones:
-- No incluir lógica de negocio ni servicios con comportamiento complejo.
-- Mantener tipos estáticos y seguros (evitar mágia en strings sin comentar).
-- Si se usa inyección de dependencias, colocar la configuración de ambientes aquí o un punto único que sea consumido desde el bootstrap.
-- Documentar cambios de configuración en el archivo o en el README de la carpeta.
+No debe contener:
+- lógica compleja de negocio
+- widgets o pantallas
+- clases de dominio específicas de una feature
 
 ---
 
-2) lib/core
+## 2) lib/core
 
 Responsabilidad:
-- Contener todo lo que es compartido entre features y que no pertenece a ninguna funcionalidad concreta: abstracciones, utilidades, modelos base, manejo de errores, implementaciones genéricas de servicios (client HTTP, logger), helpers y componentes UI reutilizables.
+- Alojar todo el código transversal que se reutiliza en varias features.
+- Ser el lugar del núcleo técnico del proyecto.
 
-Contenido típico:
-- models/ (entidades genéricas o DTOs que se comparten)
-- errors/ (excepciones, mapeo de errores)
-- network/ (cliente HTTP, interceptors)
-- services/ (interfaces y adaptadores reutilizables)
-- utils/ (helpers, extensiones)
-- widgets/ (componentes UI reutilizables: botones, layouts comunes)
+Debe contener:
+- servicios globales (network, storage, logger, DI, etc.)
+- utilidades y helpers compartidos
+- manejo de errores y excepciones
+- router, theme, helpers de formato o validación
+- widgets reutilizables a nivel de aplicación
 
-Reglas y recomendaciones:
-- Mantener el core lo más estable posible: cambios aquí impactan muchas features.
-- Separar interfaces (contratos) de implementaciones concretas. Preferir que features dependan de interfaces del core y no de implementaciones concretas.
-- Exportar un barrel file (`core.dart`) para importar desde features: `import 'package:project_name/core.dart';`.
-- Evitar dependencias hacia features desde core para prevenir ciclos.
+Reglas:
+- El core no debe depender de features específicas.
+- Si algo se usa en más de una feature y no pertenece a una feature concreta, va aquí.
+- Si algo es solo de una feature, no va en core.
 
 ---
 
-3) lib/features
+## 3) lib/features
 
 Responsabilidad:
-- Implementar las funcionalidades del dominio en módulos independientes y encapsulados. Cada feature debe contener su propia estructura (idealmente siguiendo capas: presentation, domain, data) para facilitar testing, entendimiento y reuso.
+- Agrupar las funcionalidades del negocio por dominio.
+- Cada feature debe ser autónoma y tener su propia capa de presentación, dominio y datos.
 
-Estructura sugerida por feature (ejemplo `features/auth`):
-- features/
-  - auth/
-    - presentation/ (widgets, pantallas, controllers/blocs/viewmodels)
-    - domain/ (entidades del dominio, casos de uso / usecases, interfaces de repositorio)
-    - data/ (implementaciones de repositorio, fuentes de datos: API, local)
-    - widgets/ (componentes específicos de la feature)
-    - auth_exports.dart (barrel file local si hace falta)
+### Estructura recomendada por feature
 
-Reglas y recomendaciones:
-- Encapsular internamente: otras features deben interactuar con la feature a través de su API pública o mediante contratos/servicios (interfaces en core o domain).
-- Mantener dependencias hacia `core` y `config` únicamente; evitar que features se dependan entre sí directamente (usar eventos, servicios compartidos o repositorios definidos en core para comunicar).
-- Tests: cada feature debe tener sus tests unitarios y de integración localizados en `test/features/<feature_name>/...`.
-- Documentar la API pública de la feature en un README dentro de la carpeta cuando la feature expone contratos usados por otras partes.
+Por ejemplo, para [lib/features/auth](lib/features/auth):
+
+- [lib/features/auth/data](lib/features/auth/data):
+  - fuentes de datos remotas o locales
+  - modelos de datos
+  - repositorios concretos
+  - adaptadores o mappers
+
+- [lib/features/auth/domain](lib/features/auth/domain):
+  - entidades del dominio
+  - contratos de repositorio
+  - casos de uso o use cases
+  - reglas de negocio puras
+
+- [lib/features/auth/presentation](lib/features/auth/presentation):
+  - pantallas
+  - páginas
+  - widgets específicos
+  - providers, controllers o view models
+  - navegación local de la feature
+
+### Reglas para las features
+- Una feature solo debe conocer lo que necesita para cumplir su responsabilidad.
+- No crear carpetas separadas por pantalla si ya existe una feature que agrupa varias pantallas del mismo dominio.
+- Auth debe permanecer como una única feature, aunque tenga login, register y forgot password.
+- Las features principales esperadas son:
+  - auth
+  - home
+  - services
+  - bookings
+  - profile
+  - chat
+  - notifications
+  - favorites
+  - reviews
+  - payments
 
 ---
 
-4) lib/main.dart
+## 4) lib/shared
 
 Responsabilidad:
-- Punto de arranque de la aplicación. Inicializa la configuración global, el DI (si aplica), handlers globales de errores, logging y lanza la aplicación (por ejemplo `runApp(MyApp())` si es Flutter).
+- Contener componentes reutilizables que se usan en varias pantallas pero que no son tan globales como los del core.
 
-Buenas prácticas:
-- Mantener `main.dart` lo más pequeño posible: delegar la lógica de bootstrap a un archivo/función (ej.: `bootstrap.dart` en `core` o `config`) para mantener testabilidad.
-- No incluir lógica de negocio aquí: solo inicialización y wiring.
+Debe contener:
+- componentes UI compartidos
+- widgets de uso general dentro de la app
+- helpers visuales o layouts reutilizables
 
----
-
-Convenciones y buenas prácticas generales
-
-- Separación de capas: donde aplique, seguir la separación presentation/domain/data para cada feature.
-- Barrels: usar archivos barrel (`index`/`exports`) por carpeta para simplificar imports y controlar la API pública de cada módulo.
-- Naming: usar nombres consistentes y en inglés o español según el estándar del repositorio (preferir inglés en proyectos abiertos). Ej.: `auth_repository.dart`, `get_current_user_usecase.dart`.
-- Tests: cada carpeta relevante debe incluir su equivalente de tests. Mantener unitarios dentro de `test/` y organizar por feature.
-- Evitar ciclos de dependencia: las dependencias deben apuntar desde features -> core/config, nunca al revés. Usar contratos/abstract classes para invertir dependencias cuando sea necesario.
-- Documentación local: cada feature y cada carpeta core deben tener un README corto explicando su propósito y puntos de contacto con el resto de la app.
-
-Cómo añadir una nueva feature (pasos recomendados)
-
-1. Crear `features/<feature_name>/` con subcarpetas `presentation`, `domain`, `data`.
-2. Definir las interfaces y casos de uso en `domain/`.
-3. Implementar repositorios y data sources en `data/`.
-4. Implementar la UI y controladores en `presentation/`.
-5. Añadir tests unitarios y de integración en `test/features/<feature_name>/`.
-6. Añadir un barrel `features/<feature_name>/index.dart` que exporte lo público.
-7. Registrar la feature en el wiring/DI si la app lo requiere (p. ej. en `main.dart` o en el bootstrap).
-
-Comprobaciones de calidad antes de mergear cambios
-
-- ¿El cambio introduce dependencia entre features? Evitarlo.
-- ¿Existe documentación o README en la carpeta modificada? Añadir si falta.
-- ¿Se añadieron tests para la nueva lógica? Incluirlos.
-- ¿Los nombres y exports son claros y limitan la API pública del módulo?
+No debe contener:
+- lógica de negocio específica
+- datos o modelos de dominio
+- servicios de infraestructura
 
 ---
 
-Si quieres, puedo:
-- Generar un README por cada carpeta (`lib/config/README.md`, `lib/core/README.md`, `lib/features/README.md`).
-- Crear un template de feature con la estructura sugerida.
-- Añadir un barrel `lib/core.dart` o `lib/features/index.dart` si los deseas.
+## 5) lib/main.dart
 
-Dime cuál de estas acciones prefieres y la realizo (por ejemplo, "crear templates y READMEs" o "solo crear README principal").
+Responsabilidad:
+- Ser el punto de entrada de la aplicación.
+- Inicializar la app y conectar la configuración global.
+
+Debe contener:
+- inicialización de la app
+- configuración de MaterialApp / widgets base
+- wiring inicial de dependencias si aplica
+
+No debe contener:
+- lógica de negocio compleja
+- pantallas específicas
+- reglas de dominio
+
+---
+
+## Qué debe ir en cada capa
+
+### Data
+- repositorios concretos
+- data sources
+- modelos DTO o response models
+- mappers
+- llamadas a API o almacenamiento local
+
+### Domain
+- entidades del negocio
+- contratos de repositorio
+- casos de uso
+- reglas de negocio
+
+### Presentation
+- pantallas
+- páginas
+- widgets visuales
+- state management
+- controladores y view models
+
+---
+
+## Buenas prácticas
+
+- Mantener las dependencias en una sola dirección: presentation -> domain -> data.
+- Evitar que una feature dependa directamente de otra feature.
+- Si algo se comparte entre varias features, moverlo a core o shared.
+- Mantener cada feature encapsulada y fácil de probar.
+- No mezclar UI con lógica de negocio en los widgets.
+
+---
+
+## Resumen rápido
+
+- Si es global y transversal: va en core o config.
+- Si es de una feature concreta: va en features/<feature>.
+- Si es un componente visual reutilizable: va en shared o core/widgets.
+- Si es pantalla o widget específico de una feature: va en presentation.
+- Si es regla de negocio: va en domain.
+- Si es acceso a datos: va en data.
