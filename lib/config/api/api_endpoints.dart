@@ -2,10 +2,10 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   // Auth
-  static const login = '/auth/login';
-  static const logout = '/auth/logout';
-  static const register = '/auth/register';
-  static const refreshToken = '/auth/refresh';
+  static const login = '/login';
+  static const logout = '/logout';
+  static const register = '/register';
+  static const refreshToken = '/refresh';
 
   // Users
   static const profile = '/users/profile';

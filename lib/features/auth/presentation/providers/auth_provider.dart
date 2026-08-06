@@ -1,10 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/user_model.dart';
+import 'package:manolista/core/di/providers.dart';
+
+import '../../domain/entities/user_entity.dart';
+import '../../domain/usecases/login_usecase.dart';
+
+// =====================
+// STATE
+// =====================
 
 class AuthState {
   final bool isAuthenticated;
   final bool isLoading;
-  final UserModel? user;
+  final UserEntity? user;
   final String? error;
 
   const AuthState({
@@ -17,70 +24,59 @@ class AuthState {
   AuthState copyWith({
     bool? isAuthenticated,
     bool? isLoading,
-    UserModel? user,
+    UserEntity? user,
     String? error,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+
       isLoading: isLoading ?? this.isLoading,
+
       user: user ?? this.user,
+
       error: error,
     );
   }
 }
 
+// =====================
+// DEPENDENCY
+// =====================
+
+// Este provider entrega el caso de uso
+final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
+  return LoginUseCase(ref.read(authRepositoryProvider));
+});
+
+// =====================
+// NOTIFIER
+// =====================
+
 class AuthNotifier extends Notifier<AuthState> {
+  late LoginUseCase loginUseCase;
+
   @override
-  AuthState build() => const AuthState();
+  AuthState build() {
+    loginUseCase = ref.read(loginUseCaseProvider);
+
+    return const AuthState();
+  }
 
   Future<void> login(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
-    try {
-      await Future.delayed(const Duration(milliseconds: 800));
-      final user = UserModel(
-        id: '1',
-        name: 'Usuario Manolista',
-        email: email,
-        role: UserRole.client,
-      );
-      state = state.copyWith(
-        isLoading: false,
-        isAuthenticated: true,
-        user: user,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Credenciales incorrectas. Intenta de nuevo.',
-      );
-    }
-  }
 
-  Future<void> register(
-    String name,
-    String email,
-    String password,
-    UserRole role,
-  ) async {
-    state = state.copyWith(isLoading: true, error: null);
     try {
-      await Future.delayed(const Duration(milliseconds: 800));
-      final user = UserModel(
-        id: '1',
-        name: name,
-        email: email,
-        role: role,
-      );
+      final user = await loginUseCase(email, password);
+
       state = state.copyWith(
         isLoading: false,
+
         isAuthenticated: true,
+
         user: user,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Error al registrarse. Intenta de nuevo.',
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -89,4 +85,10 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 }
 
-final authProvider = NotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new);
+// =====================
+// PROVIDER PRINCIPAL
+// =====================
+
+final authProvider = NotifierProvider<AuthNotifier, AuthState>(
+  AuthNotifier.new,
+);

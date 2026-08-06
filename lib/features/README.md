@@ -78,3 +78,56 @@ Cómo añadir una nueva feature (pasos rápidos)
 6. Registrar la feature en el DI y en el enrutador de la app.
 7. Añadir tests unitarios e integración.
 
+               USER
+                |
+                |
+          LoginScreen
+                |
+                |
+        authProvider.login()
+                |
+                |
+          AuthNotifier
+                |
+                |
+          LoginUseCase
+                |
+                |
+        AuthRepository
+          (contrato)
+                |
+                |
+     AuthRepositoryImpl
+                |
+                |
+     AuthRemoteDataSource
+          (contrato)
+                |
+                |
+ AuthRemoteDataSourceImpl
+                |
+                |
+          ApiClient
+                |
+                |
+             Dio
+                |
+                |
+            BACKEND
+
+
+BACKEND RESPONSE
+
+JSON
+ |
+ ↓
+UserModel
+ |
+ ↓
+UserEntity
+ |
+ ↓
+AuthState
+ |
+ ↓
+HomeScreen

@@ -76,11 +76,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'login',
         builder: (context, state) => const LoginScreen(),
       ),
-      GoRoute(
-        path: RouteNames.register,
-        name: 'register',
-        builder: (context, state) => const RegisterScreen(),
-      ),
+      // GoRoute(
+      //   path: RouteNames.register,
+      //   name: 'register',
+      //   builder: (context, state) => const RegisterScreen(),
+      // ),
       GoRoute(
         path: RouteNames.services,
         name: 'services',
@@ -139,11 +139,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Text('Ruta no encontrada: ${state.uri}'),
-      ),
-    ),
+    errorBuilder: (context, state) =>
+        Scaffold(body: Center(child: Text('Ruta no encontrada: ${state.uri}'))),
   );
 });
 

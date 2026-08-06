@@ -18,7 +18,7 @@ class ProfileScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              ref.read(authProvider.notifier).logout();
+              // ref.read(authProvider.notifier).logout();
               context.go(RouteNames.login);
             },
           ),
@@ -33,7 +33,11 @@ class ProfileScreen extends ConsumerWidget {
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: context.colors.primary,
-                  child: const Icon(Icons.person, size: 48, color: Colors.white),
+                  child: const Icon(
+                    Icons.person,
+                    size: 48,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Text(
