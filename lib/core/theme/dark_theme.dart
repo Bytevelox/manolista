@@ -22,6 +22,22 @@ class DarkTheme {
   static final theme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
+    scaffoldBackgroundColor: colors.background,
+    colorScheme: ColorScheme.dark(
+      primary: colors.primary,
+      secondary: colors.secondary,
+      surface: colors.surface,
+      error: colors.error,
+      onPrimary: Colors.black,
+      onSecondary: Colors.black,
+      onSurface: colors.textPrimary,
+      onError: Colors.white,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: colors.surface,
+      foregroundColor: colors.textPrimary,
+      elevation: 0,
+    ),
     extensions: const [colors],
   );
 }

@@ -22,6 +22,22 @@ class LightTheme {
   static final theme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
+    scaffoldBackgroundColor: colors.background,
+    colorScheme: ColorScheme.light(
+      primary: colors.primary,
+      secondary: colors.secondary,
+      surface: colors.surface,
+      error: colors.error,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: colors.textPrimary,
+      onError: Colors.white,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: colors.primary,
+      foregroundColor: Colors.white,
+      elevation: 0,
+    ),
     extensions: const [colors],
   );
 }
