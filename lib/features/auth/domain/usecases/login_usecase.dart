@@ -1,12 +1,13 @@
+import 'package:manolista/features/auth/domain/entities/auth_session_entity.dart';
+
 import '../repositories/auth_repository.dart';
-import '../entities/user_entity.dart';
 
 class LoginUseCase {
   final AuthRepository repository;
 
   const LoginUseCase(this.repository);
 
-  Future<UserEntity> call(String email, String password) {
+  Future<AuthSessionEntity> call(String email, String password) {
     return repository.login(email, password);
   }
 }

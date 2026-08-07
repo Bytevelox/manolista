@@ -1,93 +1,90 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:manolista/core/di/providers.dart';
 
-import '../../domain/entities/user_entity.dart';
+import 'package:manolista/core/di/providers.dart';
+import 'package:manolista/core/storage/token_storage.dart';
+
 import '../../domain/usecases/login_usecase.dart';
 
-// =====================
-// STATE
-// =====================
-
-class AuthState {
-  final bool isAuthenticated;
-  final bool isLoading;
-  final UserEntity? user;
-  final String? error;
-
-  const AuthState({
-    this.isAuthenticated = false,
-    this.isLoading = false,
-    this.user,
-    this.error,
-  });
-
-  AuthState copyWith({
-    bool? isAuthenticated,
-    bool? isLoading,
-    UserEntity? user,
-    String? error,
-  }) {
-    return AuthState(
-      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
-
-      isLoading: isLoading ?? this.isLoading,
-
-      user: user ?? this.user,
-
-      error: error,
-    );
-  }
-}
-
-// =====================
-// DEPENDENCY
-// =====================
-
-// Este provider entrega el caso de uso
-final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
-  return LoginUseCase(ref.read(authRepositoryProvider));
-});
-
-// =====================
-// NOTIFIER
-// =====================
+import 'auth_state.dart';
 
 class AuthNotifier extends Notifier<AuthState> {
-  late LoginUseCase loginUseCase;
+  late final LoginUseCase loginUseCase;
+
+  late final TokenStorage tokenStorage;
 
   @override
   AuthState build() {
     loginUseCase = ref.read(loginUseCaseProvider);
 
-    return const AuthState();
+    tokenStorage = ref.read(tokenStorageProvider);
+
+    _restoreSession();
+
+    return const AuthState(isLoading: false);
   }
+
+  // ================================
+  // RESTAURAR TOKEN
+  // ================================
+
+  Future<void> _restoreSession() async {
+    final token = await tokenStorage.getToken();
+
+    if (token != null && token.isNotEmpty) {
+      state = state.copyWith(isAuthenticated: true, initialized: true);
+    } else {
+      state = state.copyWith(isAuthenticated: false, initialized: true);
+    }
+  }
+
+  // ================================
+  // LOGIN
+  // ================================
 
   Future<void> login(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final user = await loginUseCase(email, password);
+      final session = await loginUseCase(email, password);
+
+      await tokenStorage.saveToken(session.token);
 
       state = state.copyWith(
-        isLoading: false,
-
         isAuthenticated: true,
 
-        user: user,
+        initialized: true,
+
+        isLoading: false,
+
+        session: session,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(error: e.toString(), isLoading: false);
     }
   }
 
-  void logout() {
-    state = const AuthState();
+  // ================================
+  // SPLASH TERMINADO
+  // ================================
+
+  void completeSplash() {
+    state = state.copyWith(splashCompleted: true);
+  }
+
+  // ================================
+  // LOGOUT
+  // ================================
+
+  Future<void> logout() async {
+    await tokenStorage.deleteToken();
+
+    state = const AuthState(initialized: true, splashCompleted: true);
   }
 }
 
-// =====================
-// PROVIDER PRINCIPAL
-// =====================
+// ================================
+// PROVIDER
+// ================================
 
 final authProvider = NotifierProvider<AuthNotifier, AuthState>(
   AuthNotifier.new,

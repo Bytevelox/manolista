@@ -1,3 +1,0 @@
-﻿class AuthEntity {
-  const AuthEntity();
-}

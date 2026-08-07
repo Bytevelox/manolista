@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import '../../config/api/api_config.dart';
+import '../storage/token_storage.dart';
+import 'interceptors/auth_interceptor.dart';
 
 class DioClient {
   DioClient._();
 
-  static Dio create({String? Function()? tokenGetter}) {
+  static Dio create(TokenStorage tokenStorage) {
     final dio = Dio(
       BaseOptions(
         baseUrl: ApiConfig.baseUrl,
@@ -17,23 +19,7 @@ class DioClient {
       ),
     );
 
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          if (tokenGetter != null) {
-            final token = tokenGetter();
-            if (token != null && token.isNotEmpty) {
-              options.headers['Authorization'] = 'Bearer $token';
-            }
-          }
-          return handler.next(options);
-        },
-        onError: (DioException error, handler) {
-          // Log network error or trigger refresh token logic here when needed
-          return handler.next(error);
-        },
-      ),
-    );
+    dio.interceptors.add(AuthInterceptor(tokenStorage));
 
     return dio;
   }

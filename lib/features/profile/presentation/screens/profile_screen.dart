@@ -8,7 +8,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authProvider).user;
+    // final user = ref.watch(authProvider).user;
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -18,7 +18,7 @@ class ProfileScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // ref.read(authProvider.notifier).logout();
+              ref.read(authProvider.notifier).logout();
               context.go(RouteNames.login);
             },
           ),
@@ -41,7 +41,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  user?.name ?? 'Usuario de Prueba',
+                  'Usuario de Prueba',
                   style: TextStyle(
                     color: context.colors.textPrimary,
                     fontSize: 20,
@@ -49,7 +49,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  user?.email ?? 'usuario@manolista.app',
+                  'usuario@manolista.app',
                   style: TextStyle(color: context.colors.textSecondary),
                 ),
               ],

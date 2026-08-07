@@ -19,7 +19,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );
-
       return UserModel.fromJson(response.data);
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionError ||

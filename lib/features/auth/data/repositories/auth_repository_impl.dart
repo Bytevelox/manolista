@@ -1,5 +1,6 @@
 import 'package:manolista/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:manolista/features/auth/domain/entities/user_entity.dart';
+import 'package:manolista/features/auth/domain/entities/auth_session_entity.dart';
+
 import 'package:manolista/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -8,8 +9,11 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<UserEntity> login(String email, String password) async {
+  Future<AuthSessionEntity> login(String email, String password) async {
     final userModel = await remoteDataSource.login(email, password);
-    return userModel.toEntity();
+    return AuthSessionEntity(
+      user: userModel.toEntity(),
+      token: userModel.token,
+    );
   }
 }

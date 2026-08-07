@@ -1,5 +1,5 @@
-import '../entities/user_entity.dart';
+import 'package:manolista/features/auth/domain/entities/auth_session_entity.dart';
 
 abstract class AuthRepository {
-  Future<UserEntity> login(String email, String password);
+  Future<AuthSessionEntity> login(String email, String password);
 }

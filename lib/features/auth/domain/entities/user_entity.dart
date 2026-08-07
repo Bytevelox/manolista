@@ -1,11 +1,15 @@
 class UserEntity {
   final String id;
-  final String email;
-  final String? name;
+  final String firstName;
+  final String lastName;
+  final String? profileImgUrl;
+  final bool isActive;
 
   const UserEntity({
     required this.id,
-    required this.email,
-    this.name,
+    required this.firstName,
+    required this.lastName,
+    this.profileImgUrl,
+    required this.isActive,
   });
 }
