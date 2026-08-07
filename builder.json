@@ -1,0 +1,15 @@
+{
+  "project": "manolista",
+  "platform": "ios",
+  "github": {
+    "owner": "Bytevelox",
+    "repo": "manolista"
+  },
+  "ios": {},
+  "flutter": {
+    "version": "3.44.4",
+    "watch": {}
+  },
+  "reactNative": {},
+  "mobai": {}
+}
