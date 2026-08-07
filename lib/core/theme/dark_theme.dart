@@ -5,10 +5,12 @@ class DarkTheme {
   DarkTheme._();
 
   static const colors = AppColors(
-    primary: Color(0xFF90CAF9),
+    primary: Color(0xFF00355F),
     secondary: Color(0xFF64B5F6),
 
     background: Color(0xFF121212),
+    gradientBackgroundPrimary: Color(0xFFEFF4FB),
+    gradientBackgroundSecondary: Color(0xFFFFFFFF),
     surface: Color(0xFF1E1E1E),
 
     textPrimary: Colors.white,

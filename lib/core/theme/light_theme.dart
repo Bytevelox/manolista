@@ -5,14 +5,17 @@ class LightTheme {
   LightTheme._();
 
   static const colors = AppColors(
-    primary: Color(0xFF1565C0),
+    primary: Color(0xFF00355F),
     secondary: Color(0xFF42A5F5),
 
     background: Color(0xFFF5F5F5),
+    gradientBackgroundPrimary: Color(0xFFEFF4FB),
+    gradientBackgroundSecondary: Color(0xFFF4F8ED),
+
     surface: Colors.white,
 
     textPrimary: Color(0xFF212121),
-    textSecondary: Color(0xFF757575),
+    textSecondary: Color(0xFF42474F),
 
     success: Color(0xFF4CAF50),
     warning: Color(0xFFFF9800),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:manolista/core/constants/app_images.dart';
 import 'package:manolista/core/core.dart';
 import 'package:manolista/features/auth/presentation/providers/auth_provider.dart';
 
@@ -102,28 +103,7 @@ class _LoginHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [context.colors.primary, context.colors.secondary],
-            ),
-
-            borderRadius: BorderRadius.circular(20),
-          ),
-
-          child: const Icon(
-            Icons.handyman_rounded,
-
-            color: Colors.white,
-
-            size: 40,
-          ),
-        ),
-
-        const SizedBox(height: 28),
-
+        Image.asset(AppImages.logo, width: 160, height: 160),
         Text(
           '¡Bienvenido de vuelta!',
 

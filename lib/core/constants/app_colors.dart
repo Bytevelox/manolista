@@ -6,6 +6,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.primary,
     required this.secondary,
     required this.background,
+    required this.gradientBackgroundPrimary,
+    required this.gradientBackgroundSecondary,
     required this.surface,
     required this.textPrimary,
     required this.textSecondary,
@@ -27,6 +29,9 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color warning;
   final Color error;
 
+  final Color gradientBackgroundPrimary;
+  final Color gradientBackgroundSecondary;
+
   @override
   AppColors copyWith({
     Color? primary,
@@ -38,6 +43,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? success,
     Color? warning,
     Color? error,
+    Color? gradientBackgroundPrimary,
+    Color? gradientBackgroundSecondary,
   }) {
     return AppColors(
       primary: primary ?? this.primary,
@@ -49,12 +56,16 @@ class AppColors extends ThemeExtension<AppColors> {
       success: success ?? this.success,
       warning: warning ?? this.warning,
       error: error ?? this.error,
+      gradientBackgroundPrimary:
+          gradientBackgroundPrimary ?? this.gradientBackgroundPrimary,
+      gradientBackgroundSecondary:
+          gradientBackgroundSecondary ?? this.gradientBackgroundSecondary,
     );
   }
 
   @override
-  AppColors lerp(ThemeExtension<AppColors>? other, double t) {
-    if (other is! AppColors) return this;
+  AppColors lerp(covariant AppColors? other, double t) {
+    if (other == null) return this;
 
     return AppColors(
       primary: Color.lerp(primary, other.primary, t)!,
@@ -66,6 +77,16 @@ class AppColors extends ThemeExtension<AppColors> {
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       error: Color.lerp(error, other.error, t)!,
+      gradientBackgroundPrimary: Color.lerp(
+        gradientBackgroundPrimary,
+        other.gradientBackgroundPrimary,
+        t,
+      )!,
+      gradientBackgroundSecondary: Color.lerp(
+        gradientBackgroundSecondary,
+        other.gradientBackgroundSecondary,
+        t,
+      )!,
     );
   }
 }
